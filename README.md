@@ -67,3 +67,4 @@ npm run dev
 3. Create an API key
 4. Add it to `backend/.env` as `GROQ_API_KEY=gsk_...`
    — or enter it directly in the app's sidebar
+"# FinGenie" 
