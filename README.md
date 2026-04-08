@@ -1,70 +1,66 @@
-# FinGenie — AI Financial Document Analyzer
+# FinGenie - Sovereign Financial Intelligence
 
-Upload PDFs, Excel, or CSV financial statements and get instant AI-powered insights: KPI calculations, risk detection, trend analysis, and plain-language summaries.
+**Institutional-grade financial synthesis for the modern enterprise.** FinGenie transforms raw data into high-fidelity "Financial Velocity" reports, leveraging ephemeral AI processing and a zero-retention security framework.
 
 ---
 
-## Quick Start
+## 🏛️ Sovereign Intelligence Philosophy
+FinGenie is built for the "Sovereign Intelligence" era—where data extraction must be local, processing must be ephemeral, and insights must be institutional-grade.
 
-### 1. Backend (FastAPI)
+- **Zero-Retention Sandbox**: All data processing occurs in a volatile heap. No financial data is persisted to long-term storage.
+- **Institutional Aesthetic**: A premium, high-density UI designed for professional analysts, featuring glassmorphic components and a "Sovereign" dark palette.
+- **Financial Velocity**: Move beyond simple summaries into real-time trend synthesis and risk-matrix evaluation.
 
+## 🚀 Technical Architecture
+
+| Layer | Technology | Role |
+| :--- | :--- | :--- |
+| **Frontend** | React 19 + Vite | High-performance, low-latency institutional UI |
+| **Intelligence** | Groq (Llama 3.3 70B) | Ephemeral LLM extraction and trend synthesis |
+| **Backend** | FastAPI | High-speed, stateless data ingestion |
+| **Design** | Sovereign CSS | Variable-driven design system with 12-column grid |
+| **Routing** | Hash-Based | Browser back-button support with state persistence |
+
+## 📊 Key Modules
+
+### 1. Financial Velocity Audit
+A deep-dive analysis into Performance Momentum. Features a real-time "Snapshot Audit" of primary movers and interactive Trend Synthesis charts.
+
+### 2. Risk Matrix Audit
+Contextual risk detection that flags institutional vulnerabilities. Analyzes Gross Margin health, Cash Runway, and Operational Burn with weighted severity.
+
+### 3. Compliance Framework (SOC2 Type II Ready)
+A fully integrated legal framework including professional Compliance, Privacy, and Terms of Service endpoints, reinforcing the platform's focus on security and transparency.
+
+---
+
+## 🛠️ Quick Start
+
+### 1. Intelligence Ingestion (Backend)
 ```bash
 cd backend
-
-# Create and activate virtual environment
 python -m venv venv
 venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS/Linux
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Set up your Groq API key
-copy .env.example .env
-# Edit .env and add your GROQ_API_KEY
-
-# Start the server
+# Add GROQ_API_KEY to .env
 uvicorn main:app --reload
-# API runs at http://localhost:8000
-# Docs at   http://localhost:8000/docs
 ```
 
-### 2. Frontend (React + Vite)
-
+### 2. Interface Deployment (Frontend)
 ```bash
 cd frontend
 npm install
 npm run dev
-# App runs at http://localhost:5173
+# App synchronized at http://localhost:5173
 ```
 
 ---
 
-## Features
+## 🔒 Security & Compliance
+FinGenie is architected to exceed modern internal audit requirements:
+- **Hash-Routing Architecture**: Ensures UI states are accurately reflected in browser history without server-side tracking.
+- **Ephemeral Processing**: The analysis engine uses a "process-and-purge" cycle, ensuring your financial secrets stay yours.
+- **Minimalist Footprint**: Zero external tracking scripts or cookies.
 
-| Feature | Description |
-|---|---|
-| **File Upload** | PDF (text-based), Excel (.xlsx/.xls), CSV |
-| **Auto-Detection** | Identifies Balance Sheet / Income Statement / Cash Flow |
-| **KPIs** | Gross Profit Margin, Net Profit Margin, Revenue Growth, Expense Ratio, Burn Rate, Cash Runway |
-| **Risk Flags** | High Expenses (>80%), Declining Revenue, Negative Cash Flow, Low Profitability |
-| **AI Summary** | Plain-language explanation via Groq Llama 3.3 70B |
-| **Charts** | Bar, Area/Line, Pie/Donut — all interactive via Recharts |
-| **Dark Theme** | Glassmorphism design, gradient accents |
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/upload` | POST | Analyze a financial document |
-| `/api/health` | GET | Health check |
-| `/docs` | GET | Interactive API docs (Swagger) |
-
-## Getting a Free Groq API Key
-
-1. Visit [console.groq.com](https://console.groq.com)
-2. Sign up for a free account
-3. Create an API key
-4. Add it to `backend/.env` as `GROQ_API_KEY=gsk_...`
-   — or enter it directly in the app's sidebar
-"# FinGenie" 
+---
+*© 2024 FINGENIE FINANCIAL UTILITIES. ALL RIGHTS RESERVED.*
