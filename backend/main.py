@@ -5,6 +5,7 @@ from routers.analysis import router as analysis_router
 from routers.chat import router as chat_router
 from routers.report import router as report_router   
 
+
 load_dotenv()
 
 app = FastAPI(
@@ -25,6 +26,7 @@ app.add_middleware(
 app.include_router(analysis_router)
 app.include_router(chat_router)
 app.include_router(report_router) 
+
 
 @app.get("/")
 async def root():
