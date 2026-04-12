@@ -8,6 +8,7 @@ import Privacy from './components/Privacy';
 import Compliance from './components/Compliance';
 import Terms from './components/Terms';
 import DocChat from './components/DocChat';
+import ReportCenter from './components/ReportCenter';
 import { uploadAndAnalyze } from './api/client';
 import './index.css';
 
@@ -21,7 +22,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const validTabs = ['home', 'about', 'analyzer', 'trends', 'risk', 'privacy', 'compliance', 'terms'];
+      const validTabs = ['home', 'about', 'analyzer', 'trends', 'risk',  'reports','privacy', 'compliance', 'terms'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else if (!hash) {
@@ -100,6 +101,12 @@ export default function App() {
               >
                 Risk
               </button>
+              <button
+                className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+                onClick={() => navigateTo('reports')}
+              >
+                Reports
+              </button>
             </>
           )}
         </nav>
@@ -122,6 +129,9 @@ export default function App() {
         {activeTab === 'analyzer' && result && <Analyzer result={result} />}
         {activeTab === 'trends' && result && <TrendsAudit result={result} />}
         {activeTab === 'risk' && result && <RiskAssessment result={result} />}
+        {activeTab === 'reports' && result && (
+          <ReportCenter analysisResult={result} />
+        )}
         {activeTab === 'privacy' && <Privacy />}
         {activeTab === 'compliance' && <Compliance />}
         {activeTab === 'terms' && <Terms />}
