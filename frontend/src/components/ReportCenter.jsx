@@ -1,8 +1,6 @@
 // ReportCenter.jsx — FinGenie Report Center
 import { useState } from 'react';
-import BoardroomPDF from './BoardroomPDF';
-import AnalystDeck from './AnalystDeck';
-import EmailDigest from './EmailDigest';
+import ExportSuite from './ExportSuite';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -82,26 +80,19 @@ function printViaIframe(html) {
   }, 500);
 }
 
-// ── Analyzer-style header — mirrors Analyzer.jsx report-header block ──────────
+// ── Analyzer-style header ─────────────────────────────────────────────────────
 function ReportCenterHeader({ analysisResult }) {
-  const kpis          = analysisResult?.kpis          || [];
-  const risks         = analysisResult?.risks         || [];
-  const recs          = analysisResult?.recommendations || [];
-  const rawData       = analysisResult?.raw_data       || [];
-  const stmtType      = analysisResult?.statement_type || 'FG-24';
-  const parsingMode   = analysisResult?.parsing_mode   || 'standard';
-  const summary       = analysisResult?.summary        || '';
-
-  // Pick top 2 KPIs for the blue sidebar cards (same as Analyzer mainKpis)
-  const mainKpis  = kpis.slice(0, 2);
-  // Pick next 4 for the liquidity list (same as Analyzer otherKpis)
-  const otherKpis = kpis.slice(2, 6);
+  const kpis        = analysisResult?.kpis          || [];
+  const risks       = analysisResult?.risks         || [];
+  const recs        = analysisResult?.recommendations || [];
+  const rawData     = analysisResult?.raw_data       || [];
+  const stmtType    = analysisResult?.statement_type || 'FG-24';
+  const parsingMode = analysisResult?.parsing_mode   || 'standard';
 
   const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
     <div className="fade-in slide-up">
-      {/* ── Header band — identical language to Analyzer ── */}
       <div
         className="report-header"
         style={{ borderBottom: '1px solid var(--border-light)', paddingBottom: '40px', marginBottom: '48px' }}
@@ -114,7 +105,6 @@ function ReportCenterHeader({ analysisResult }) {
           <span style={{ color: 'var(--accent-emerald)' }}>Generation Suite.</span>
         </h1>
 
-        {/* Meta bar — same layout as Analyzer */}
         <div
           className="meta-bar"
           style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}
@@ -143,21 +133,19 @@ function ReportCenterHeader({ analysisResult }) {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }
 
 // ── AI Report Generator ───────────────────────────────────────────────────────
 function AIReportGenerator({ analysisResult }) {
-  const [format,      setFormat]      = useState('executive');
-  const [report,      setReport]      = useState('');
-  const [wordCount,   setWordCount]   = useState(0);
-  const [loading,     setLoading]     = useState(false);
-  const [error,       setError]       = useState('');
-  const [downloaded,  setDownloaded]  = useState(false);
-  const [pdfSaved,    setPdfSaved]    = useState(false);
+  const [format,     setFormat]     = useState('executive');
+  const [report,     setReport]     = useState('');
+  const [wordCount,  setWordCount]  = useState(0);
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState('');
+  const [downloaded, setDownloaded] = useState(false);
+  const [pdfSaved,   setPdfSaved]   = useState(false);
 
   const selectedFmt = AI_REPORT_FORMATS.find(f => f.id === format);
 
@@ -240,9 +228,7 @@ function AIReportGenerator({ analysisResult }) {
         <span className="ai-chip">⚠️ {analysisResult?.risks?.length || 0} Risks</span>
         <span className="ai-chip">💡 {analysisResult?.recommendations?.length || 0} Recs</span>
         <span className="ai-chip">📋 {analysisResult?.raw_data?.length || 0} Data rows</span>
-        <span className="ai-chip ai-chip-type">
-          🏷️ {analysisResult?.statement_type || 'Unknown type'}
-        </span>
+        <span className="ai-chip ai-chip-type">🏷️ {analysisResult?.statement_type || 'Unknown type'}</span>
       </div>
 
       <button
@@ -291,19 +277,15 @@ export default function ReportCenter({ analysisResult }) {
   if (!analysisResult) return null;
 
   const layers = [
-    { id: 'ai', num: '',      icon: '🤖', title: 'AI Report'     },
-    { id: 1,    num: '', icon: '📋', title: 'Boardroom PDF' },
-    { id: 2,    num: '', icon: '📊', title: 'Analyst Deck'  },
-    { id: 3,    num: '', icon: '📧', title: 'Email Digest'  },
+    { id: 'ai',     icon: '🤖', title: 'AI Report'    },
+    { id: 'export', icon: '📦', title: 'Export Suite'  },
   ];
 
   return (
     <section className="card report-center-card fade-in" id="report-center-section">
 
-    
       <ReportCenterHeader analysisResult={analysisResult} />
 
-      {/* ── Divider label before tabs ── */}
       <div style={{ marginBottom: '24px' }}>
         <div className="sub-label" style={{ marginBottom: '16px' }}>REPORT GENERATION TOOLS</div>
 
@@ -315,7 +297,6 @@ export default function ReportCenter({ analysisResult }) {
               className={`layer-tab ${activeLayer === layer.id ? 'active' : ''} ${layer.id === 'ai' ? 'layer-tab-ai' : ''}`}
               onClick={() => setActiveLayer(layer.id)}
             >
-              <div className="lt-num">{layer.num}</div>
               <span className="lt-icon">{layer.icon}</span>
               <div className="lt-title">{layer.title}</div>
             </button>
@@ -323,12 +304,10 @@ export default function ReportCenter({ analysisResult }) {
         </div>
       </div>
 
-      {/* ── Tab panels ── */}
+      {/* Tab panels */}
       <div className="layer-panels">
-        {activeLayer === 'ai' && <AIReportGenerator analysisResult={analysisResult} />}
-        {activeLayer === 1    && <BoardroomPDF analysisResult={analysisResult} />}
-        {activeLayer === 2    && <AnalystDeck  analysisResult={analysisResult} />}
-        {activeLayer === 3    && <EmailDigest  analysisResult={analysisResult} />}
+        {activeLayer === 'ai'     && <AIReportGenerator analysisResult={analysisResult} />}
+        {activeLayer === 'export' && <ExportSuite       analysisResult={analysisResult} />}
       </div>
     </section>
   );
