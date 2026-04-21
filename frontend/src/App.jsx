@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react';
+import { 
+  Home as HomeIcon, BarChart3, TrendingUp, ShieldAlert, FileText, 
+  PlusCircle, Info, Lock, Scale, FileCheck
+} from 'lucide-react';
 import Home from './components/Home';
 import About from './components/About';
 import Analyzer from './components/Analyzer';
@@ -18,20 +22,32 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- Hash Routing Sync ---
+  // --- Hash Routing Sync & Reload Redirect ---
   useEffect(() => {
+    // 1. Detect if this is a page reload/refresh
+    const [navigation] = performance.getEntriesByType('navigation');
+    const isReload = navigation?.type === 'reload';
+
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const validTabs = ['home', 'about', 'analyzer', 'trends', 'risk',  'reports','privacy', 'compliance', 'terms'];
+      const validTabs = ['home', 'about', 'analyzer', 'trends', 'risk', 'reports', 'privacy', 'compliance', 'terms'];
+      
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
-      } else if (!hash) {
+      } else {
+        // Fallback or default to home
         setActiveTab('home');
       }
     };
 
-    // Initialize on mount
-    handleHashChange();
+    // 2. If reload occurs on a deep link/fragment, redirect to home
+    if (isReload && window.location.hash !== '' && window.location.hash !== '#home') {
+      window.location.hash = ''; // Clear hash
+      setActiveTab('home');      // Reset state
+    } else {
+      // Normal mount or navigation
+      handleHashChange();
+    }
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
@@ -70,57 +86,66 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* ─── Header ─────────────────────────────────────────── */}
-      <header className="navbar">
-        <div 
-          className="brand-text" 
-          onClick={() => navigateTo('home')}
-          style={{ cursor: 'pointer' }}
-        >
-          FinGenie
-        </div>
+      <nav className="navbar">
+        <a href="/" className="brand-text d-flex items-center gap-2" onClick={(e) => { e.preventDefault(); navigateTo('home'); }}>
+          <div style={{ background: 'var(--gradient-premium)', color: 'white', padding: '6px', borderRadius: '8px', display: 'flex' }}>
+             <TrendingUp size={20} />
+          </div>
+          <span>Fin<span className="text-accent">Genie</span></span>
+        </a>
         
-        <nav className="nav-links">
+        <div className="nav-links">
+          <button 
+            className={`nav-item d-flex items-center gap-2 ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => navigateTo('home')}
+          >
+            <HomeIcon size={14} />
+            Home
+          </button>
           {result && (
             <>
               <button 
-                className={`nav-item ${activeTab === 'analyzer' ? 'active' : ''}`}
+                className={`nav-item d-flex items-center gap-2 ${activeTab === 'analyzer' ? 'active' : ''}`}
                 onClick={() => navigateTo('analyzer')}
               >
+                <BarChart3 size={14} />
                 Analyzer
               </button>
               <button 
-                className={`nav-item ${activeTab === 'trends' ? 'active' : ''}`}
+                className={`nav-item d-flex items-center gap-2 ${activeTab === 'trends' ? 'active' : ''}`}
                 onClick={() => navigateTo('trends')}
               >
+                <TrendingUp size={14} />
                 Trends
               </button>
               <button 
-                className={`nav-item ${activeTab === 'risk' ? 'active' : ''}`}
+                className={`nav-item d-flex items-center gap-2 ${activeTab === 'risk' ? 'active' : ''}`}
                 onClick={() => navigateTo('risk')}
               >
+                <ShieldAlert size={14} />
                 Risk
               </button>
               <button
-                className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+                className={`nav-item d-flex items-center gap-2 ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => navigateTo('reports')}
               >
+                <FileText size={14} />
                 Reports
               </button>
             </>
           )}
-        </nav>
+        </div>
 
         <div className="nav-actions">
           {result && (
-            <button className="btn-primary" style={{ padding: '8px 24px', fontSize: '14px' }} onClick={handleAnalyzeNew}>
-              Analyze New File
+            <button className="btn-primary" onClick={handleAnalyzeNew}>
+              <PlusCircle size={16} />
+              Analyze New
             </button>
           )}
         </div>
-      </header>
+      </nav>
 
-      {/* ─── Main Content Views ─────────────────────────────── */}
       <main className="main-content">
         {activeTab === 'home' && (
            <Home onFileSelect={handleFileSelect} isLoading={isLoading} error={error} />
@@ -136,27 +161,37 @@ export default function App() {
         {activeTab === 'compliance' && <Compliance />}
         {activeTab === 'terms' && <Terms />}
       </main>
+
       {result && <DocChat analysisResult={result} />}
-      {/* ─── Footer ─────────────────────────────────────────── */}
+
       <footer className="site-footer">
-        <div className="footer-content" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-          <div className="footer-left" style={{display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start'}}>
-            <div className="brand-text" style={{fontSize: '24px', color: 'var(--text-white)', cursor: 'pointer'}} onClick={() => navigateTo('home')}>FinGenie</div>
-            <div className="footer-copyright" style={{fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.04em'}}>
-              © 2024 FINGENIE FINANCIAL UTILITIES. ALL RIGHTS RESERVED.
+        <div className="footer-content">
+          <div className="footer-brand">
+            <div className="brand-text d-flex items-center gap-2" onClick={() => navigateTo('home')}>
+               <TrendingUp size={18} className="text-accent" />
+               <span>FinGenie</span>
             </div>
+            <p className="footer-tagline">Institutional Intelligence Engine</p>
           </div>
 
-          <div className="footer-right" style={{display: 'flex', gap: '0', alignItems: 'center'}}>
-            <span className="footer-link" onClick={() => navigateTo('about')}>About</span>
-            <span className="footer-link" onClick={() => navigateTo('privacy')}>Privacy</span>
-            <span className="footer-link" onClick={() => navigateTo('compliance')}>Compliance</span>
-            <span className="footer-link" onClick={() => navigateTo('terms')}>Terms</span>
-            <div className="footer-socials" style={{marginLeft: '16px'}}>
-              <div className="social-icon">𝕏</div>
-              <div className="social-icon">in</div>
-            </div>
+          <div className="footer-links-row">
+            <span className="footer-link d-flex items-center gap-2" onClick={() => navigateTo('about')}>
+              <Info size={14} /> About
+            </span>
+            <span className="footer-link d-flex items-center gap-2" onClick={() => navigateTo('privacy')}>
+              <Lock size={14} /> Privacy
+            </span>
+            <span className="footer-link d-flex items-center gap-2" onClick={() => navigateTo('compliance')}>
+              <Scale size={14} /> Compliance
+            </span>
+            <span className="footer-link d-flex items-center gap-2" onClick={() => navigateTo('terms')}>
+              <FileCheck size={14} /> Terms
+            </span>
           </div>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2024 FINGENIE FINANCIAL UTILITIES.</span>
+          <div className="footer-legal-badge">INSTITUTIONAL ACCESS ONLY</div>
         </div>
       </footer>
     </div>

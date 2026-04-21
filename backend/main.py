@@ -43,11 +43,17 @@ async def global_exception_handler(request, exc):
     """Catch all unhandled exceptions and return structured error."""
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
     
+    # In local development (check for absence of specific prod vars), provide more detail
+    is_debug = os.getenv("DEBUG", "true").lower() == "true"
+    
+    error_msg = str(exc) if is_debug else "Internal server error. Please try again later."
+    
     return JSONResponse(
         status_code=500,
         content={
-            "detail": "Internal server error. Please try again later.",
-            "error_id": id(exc)  # For logging correlation
+            "detail": error_msg,
+            "error_id": id(exc),  # For logging correlation
+            "type": type(exc).__name__
         }
     )
 

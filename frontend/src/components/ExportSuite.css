@@ -1,174 +1,211 @@
 /* ════════════════════════════════════════════════════════════
-   ExportSuite — styles to add to your existing stylesheet
+   ExportSuite — Refined Institutional Export Styles
    ════════════════════════════════════════════════════════════ */
+
+:root {
+  --rc-surface: #ffffff;
+  --rc-surface2: #f8fafc;
+  --rc-surface3: #eff6ff;
+  --rc-accent: #2563eb;
+  --rc-border: #f1f5f9;
+  --rc-border2: #e2e8f0;
+  --rc-ink: #0f172a;
+  --rc-ink2: #475569;
+  --rc-ink3: #94a3b8;
+}
 
 /* ── Shared KPI toggle bar ── */
 .es-kpi-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  background: var(--rc-surface2);
-  border: 1px solid var(--rc-border);
-  border-radius: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-sm);
 }
+
 .es-kpi-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-family: 'Inter';
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--rc-ink3);
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
   white-space: nowrap;
 }
-.es-kpi-pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+
 .es-kpi-pill {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  border: 1.5px solid var(--rc-border);
-  background: var(--rc-surface);
-  color: var(--rc-ink2);
-  font-size: 12px;
-  font-weight: 500;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-blue-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  line-height: 1;
 }
-.es-kpi-pill:hover {
-  border-color: var(--rc-accent);
-  color: var(--rc-ink);
-}
-.es-kpi-pill.on {
-  background: var(--rc-accent);
-  border-color: var(--rc-accent);
-  color: white;
-}
-.es-kpi-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.45);
-  transition: background 0.15s;
-}
-.es-kpi-dot.on { background: rgba(255,255,255,0.9); }
-.es-kpi-pill:not(.on) .es-kpi-dot { background: var(--rc-border); }
 
-/* ── Format tab selector (PDF / Deck / Email) ── */
-.es-format-tabs {
-  display: flex;
-  gap: 0;
-  border: 1.5px solid var(--rc-border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 24px;
-  background: var(--rc-surface2);
+.es-kpi-pill:hover {
+  background: var(--border-subtle);
+  color: var(--text-primary);
 }
-.es-format-tab {
-  flex: 1;
-  display: flex;
+
+.es-kpi-pill.on {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.es-preview-badge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 11px 16px;
-  background: transparent;
-  border: none;
-  border-right: 1.5px solid var(--rc-border);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--rc-ink3);
-  transition: all 0.15s;
-}
-.es-format-tab:last-child { border-right: none; }
-.es-format-tab:hover { color: var(--rc-ink); background: var(--rc-surface); }
-.es-format-tab.active {
-  background: var(--rc-surface);
-  color: var(--rc-accent);
-  box-shadow: inset 0 -2px 0 var(--rc-accent);
-}
-.es-ft-icon { font-size: 16px; }
-.es-ft-label { font-weight: 600; }
-
-/* ── Panel wrapper ── */
-.es-panel-wrap {
-  animation: fadeInUp 0.2s ease;
-}
-.es-panel { display: flex; flex-direction: column; gap: 20px; }
-
-/* ── Two-column layout used by PDF & Email panels ── */
-.es-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-@media (max-width: 700px) {
-  .es-two-col { grid-template-columns: 1fr; }
-}
-
-/* ── PDF live preview card ── */
-.es-pdf-preview {
-  border-radius: 10px;
-  padding: 20px 22px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 99px;
   color: white;
-  min-height: 130px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  line-height: 1;
+  align-self: flex-end;
+}
+
+/* ── Custom Inputs ── */
+.es-form-group {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-}
-.es-preview-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 10px;
-}
-.es-chip {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.85);
-}
-
-/* ── Branding / settings section ── */
-.es-settings { display: flex; flex-direction: column; gap: 4px; }
-.es-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.es-field { display: flex; flex-direction: column; gap: 4px; }
-.es-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--rc-ink3);
-}
-.es-color-row {
-  display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
-/* ── Action buttons row ── */
-.es-actions {
+.custom-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: white;
+  font-family: 'Inter';
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.custom-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05);
+}
+
+.custom-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* ── Panel Transitions ── */
+.es-panel-wrap {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── PDF Preview Card ── */
+.es-pdf-preview {
+  background: var(--bg-navy);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.es-preview-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.es-preview-title {
+  font-family: 'Plus Jakarta Sans';
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.es-preview-meta {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  font-medium: 600;
+  color: rgba(255,255,255,0.6);
 }
 
-/* ── Export suite wrapper (used on layer-panel-inner level) ── */
-.export-suite {
-  /* inherits layer-panel-inner styles */
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── Color Swatches ── */
+.color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: 4px solid transparent;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  border-color: white;
+  box-shadow: 0 0 0 2px var(--accent-blue);
+}
+
+/* ── Email Preview Terminal ── */
+.email-terminal {
+  background: #0f172a;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #94a3b8;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.terminal-header {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--accent-cyan);
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.terminal-prompt { color: #f8fafc; }
+
+@keyframes slideUp { 
+  from { opacity: 0; transform: translateY(12px); } 
+  to { opacity: 1; transform: translateY(0); } 
 }

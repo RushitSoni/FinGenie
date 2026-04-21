@@ -1,38 +1,30 @@
 // ReportCenter.jsx — FinGenie Report Center
 import { useState } from 'react';
+import { 
+  FileText, TrendingUp, Search, Building2, Rocket, GraduationCap, 
+  Download, Printer, Sparkles, Box, FileOutput, Hash, Cpu, CheckCircle2 
+} from 'lucide-react';
 import ExportSuite from './ExportSuite';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const AI_REPORT_FORMATS = [
-  { id: 'executive', icon: '🏛️', label: 'Executive Brief',  desc: 'Concise strategic summary for C-suite' },
-  { id: 'investor',  icon: '📈', label: 'Investor Memo',     desc: 'Growth narrative & opportunity framing' },
-  { id: 'audit',     icon: '🔍', label: 'Internal Audit',    desc: 'Detailed compliance & risk analysis' },
-  { id: 'board',     icon: '🏢', label: 'Board Update',      desc: 'Governance-focused balanced overview' },
-  { id: 'startup',   icon: '🚀', label: 'Pitch Narrative',   desc: 'Fundraising-ready energetic framing' },
-  { id: 'academic',  icon: '🎓', label: 'Research Paper',    desc: 'Structured, methodology-driven analysis' },
+  { id: 'executive', Icon: FileText,      label: 'Executive Brief',  desc: 'Concise strategic summary for C-suite' },
+  { id: 'investor',  Icon: TrendingUp,    label: 'Investor Memo',     desc: 'Growth narrative & opportunity framing' },
+  { id: 'audit',     Icon: Search,        label: 'Internal Audit',    desc: 'Detailed compliance & risk analysis' },
+  { id: 'board',     Icon: Building2,     label: 'Board Update',      desc: 'Governance-focused balanced overview' },
+  { id: 'startup',   Icon: Rocket,        label: 'Pitch Narrative',   desc: 'Fundraising-ready energetic framing' },
+  { id: 'academic',  Icon: GraduationCap, label: 'Research Paper',    desc: 'Structured, methodology-driven analysis' },
 ];
 
-// Safely escape HTML to prevent XSS
 function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
 function mdToHtml(md) {
   if (!md) return '';
-  
-  // Step 1: Escape all HTML to prevent injection
   let escaped = escapeHtml(md);
-  
-  // Step 2: Selectively unescape and format markdown-only elements
-  // (only these safe patterns, never raw HTML)
   escaped = escaped
     .replace(/&lt;strong&gt;(.+?)&lt;\/strong&gt;/g, '<strong>$1</strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -45,7 +37,6 @@ function mdToHtml(md) {
     .replace(/<\/ul>\n<ul>/g, '')
     .replace(/^(?!<[hul])(.+)$/gm, '<p>$1</p>')
     .replace(/<p>\s*<\/p>/g, '');
-  
   return escaped;
 }
 
@@ -56,33 +47,32 @@ function buildReportHTML({ selectedFmt, stmtType, now, report }) {
 <meta charset="UTF-8"/>
 <title>FinGenie — ${selectedFmt?.label}</title>
 <style>
-  body { font-family: 'Segoe UI', system-ui, sans-serif; max-width: 800px;
-         margin: 60px auto; padding: 0 40px; color: #1a1a2e; line-height: 1.7; }
-  .cover { border-bottom: 3px solid hsl(220, 90%, 55%); padding-bottom: 32px; margin-bottom: 40px; }
+  body { font-family: 'Inter', system-ui, sans-serif; max-width: 800px;
+         margin: 60px auto; padding: 0 40px; color: #0f172a; line-height: 1.7; }
+  .cover { border-bottom: 3px solid #2563eb; padding-bottom: 32px; margin-bottom: 40px; }
   .cover-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-                   color: hsl(220, 90%, 55%); margin-bottom: 8px; }
-  .cover-title { font-size: 32px; font-weight: 700; margin: 0 0 8px; }
-  .cover-meta  { font-size: 13px; color: #6b7280; }
-  h2 { font-size: 18px; font-weight: 600; color: hsl(220, 90%, 45%);
-       border-bottom: 1px solid hsl(220, 100%, 93%); padding-bottom: 6px; margin-top: 32px; }
-  h3 { font-size: 14px; font-weight: 600; color: hsl(220, 40%, 15%); margin-top: 24px;
+                   color: #2563eb; margin-bottom: 8px; font-weight: 700; }
+  .cover-title { font-size: 36px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .cover-meta  { font-size: 13px; color: #64748b; }
+  h2 { font-size: 18px; font-weight: 700; color: #1e293b;
+       border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-top: 40px; }
+  h3 { font-size: 14px; font-weight: 700; color: #475569; margin-top: 24px;
        text-transform: uppercase; letter-spacing: .05em; }
-  p  { margin: 12px 0; color: #374151; }
-  ul { padding-left: 20px; } li { margin: 6px 0; color: #374151; }
-  em { color: #6b7280; }
-  .footer { margin-top: 60px; padding-top: 16px; border-top: 1px solid #e5e7eb;
-            font-size: 11px; color: #9ca3af; }
+  p  { margin: 16px 0; color: #334155; }
+  ul { padding-left: 20px; } li { margin: 8px 0; color: #334155; }
+  .footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid #f1f5f9;
+            font-size: 11px; color: #94a3b8; font-weight: 500; }
 </style>
 </head>
 <body>
 <div class="cover">
-  <div class="cover-eyebrow">FinGenie AI · ${stmtType}</div>
+  <div class="cover-eyebrow">FinGenie AI / Intelligence Dept.</div>
   <div class="cover-title">${selectedFmt?.label}</div>
-  <div class="cover-meta">Generated on ${now} · Powered by Groq Llama 3.3</div>
+  <div class="cover-meta">Document Focus: ${stmtType} · Generated on ${now}</div>
 </div>
 ${mdToHtml(report)}
 <div class="footer">
-  Generated by FinGenie AI · Powered by Groq Llama 3.3 · For informational purposes only.
+  FinGenie Institutional Intelligence · AI Attribution: Groq Llama 3.3 · Strictly Confidential
 </div>
 </body>
 </html>`;
@@ -101,72 +91,58 @@ function printViaIframe(html) {
   }, 500);
 }
 
-// ── Analyzer-style header ─────────────────────────────────────────────────────
 function ReportCenterHeader({ analysisResult }) {
-  const kpis        = analysisResult?.kpis          || [];
-  const risks       = analysisResult?.risks         || [];
-  const recs        = analysisResult?.recommendations || [];
-  const rawData     = analysisResult?.raw_data       || [];
-  const stmtType    = analysisResult?.statement_type || 'FG-24';
-  const parsingMode = analysisResult?.parsing_mode   || 'standard';
-
-  const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
+  const { kpis = [], risks = [], recommendations: recs = [], raw_data: rawData = [], statement_type: stmtType, parsing_mode: parsingMode } = analysisResult;
+  
   return (
-    <div className="fade-in slide-up">
-      <div
-        className="report-header"
-        style={{ borderBottom: '1px solid var(--border-light)', paddingBottom: '40px', marginBottom: '48px' }}
-      >
-        <div className="sub-label" style={{ color: 'var(--accent-blue)', marginBottom: '8px', fontSize: '13px' }}>
-          REPORT CENTER / {now.toUpperCase()}
-        </div>
-        <h1 className="big-title" style={{ fontSize: '40px' }}>
-          Multi-Format Report<br />
-          <span style={{ color: 'var(--accent-emerald)' }}>Generation Suite.</span>
-        </h1>
-
-        <div
-          className="meta-bar"
-          style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}
-        >
-          <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.03em' }}>
-            STATEMENT: {stmtType.toUpperCase()}
-          </span>
-          <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', fontWeight: 600 }}>
-              <div style={{ width: '8px', height: '8px', background: 'var(--accent-emerald)', borderRadius: '50%' }} />
-              <span>Parsing Mode: {parsingMode}</span>
+    <header className="page-header mb-xl pb-lg" style={{ borderBottom: '1px solid var(--border-light)' }}>
+      <div className="d-flex items-center gap-2 mb-xs">
+        <Sparkles className="text-accent" size={16} />
+        <span className="page-header__eyebrow">Intelligence Report Generation</span>
+      </div>
+      <div className="d-flex justify-between items-end">
+        <div>
+          <h1 className="page-header__title">
+            AI Narrative <span className="page-header__accent">Generator.</span>
+          </h1>
+          <div className="d-flex items-center gap-4 mt-md">
+            <div className="d-flex items-center gap-2 text-secondary" style={{ fontSize: '13px', fontWeight: 600 }}>
+              <Hash size={14} className="text-muted" />
+              <span>TYPE: {stmtType?.toUpperCase() || 'FIN-REP'}</span>
             </div>
-            <div style={{ display: 'flex', gap: '16px' }}>
-              {[
-                { label: 'KPIs',  val: kpis.length },
-                { label: 'Risks', val: risks.length },
-                { label: 'Recs',  val: recs.length },
-                { label: 'Rows',  val: rawData.length },
-              ].map(({ label, val }) => (
-                <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'Outfit', lineHeight: 1 }}>{val}</div>
-                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{label}</div>
-                </div>
-              ))}
+            <div className="d-flex items-center gap-2 text-secondary" style={{ fontSize: '13px', fontWeight: 600 }}>
+              <Cpu size={14} className="text-muted" />
+              <span>LOGIC: {parsingMode?.toUpperCase() || 'STD'}</span>
             </div>
           </div>
         </div>
+        
+        <div className="card-light d-flex gap-6" style={{ padding: '16px 24px', background: 'var(--bg-blue-light)', border: 'none' }}>
+          {[
+            { label: 'KPIs', val: kpis.length },
+            { label: 'Risks', val: risks.length },
+            { label: 'Recs', val: recs.length },
+            { label: 'Rows', val: rawData.length },
+          ].map(({ label, val }) => (
+            <div key={label} className="text-center">
+              <div className="metric-big" style={{ fontSize: '20px', marginBottom: '2px' }}>{val}</div>
+              <div className="sub-label" style={{ fontSize: '9px', marginBottom: 0 }}>{label}</div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </header>
   );
 }
 
-// ── AI Report Generator ───────────────────────────────────────────────────────
 function AIReportGenerator({ analysisResult }) {
-  const [format,     setFormat]     = useState('executive');
-  const [report,     setReport]     = useState('');
-  const [wordCount,  setWordCount]  = useState(0);
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState('');
+  const [format, setFormat] = useState('executive');
+  const [report, setReport] = useState('');
+  const [wordCount, setWordCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [downloaded, setDownloaded] = useState(false);
-  const [pdfSaved,   setPdfSaved]   = useState(false);
+  const [pdfSaved, setPdfSaved] = useState(false);
 
   const selectedFmt = AI_REPORT_FORMATS.find(f => f.id === format);
 
@@ -177,26 +153,23 @@ function AIReportGenerator({ analysisResult }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          format_id:       format,
-          raw_data:        analysisResult?.raw_data        || [],
-          column_headers:  analysisResult?.column_headers  || [],
-          statement_type:  analysisResult?.statement_type  || 'Financial Statement',
-          summary:         analysisResult?.summary         || '',
-          kpis:            analysisResult?.kpis            || [],
-          risks:           analysisResult?.risks           || [],
+          format_id: format,
+          raw_data: analysisResult?.raw_data || [],
+          column_headers: analysisResult?.column_headers || [],
+          statement_type: analysisResult?.statement_type || 'Financial Statement',
+          summary: analysisResult?.summary || '',
+          kpis: analysisResult?.kpis || [],
+          risks: analysisResult?.risks || [],
           recommendations: analysisResult?.recommendations || [],
-          parsing_mode:    analysisResult?.parsing_mode    || 'standard',
+          parsing_mode: analysisResult?.parsing_mode || 'standard',
         }),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.detail || `Server error ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setReport(data.report_markdown);
       setWordCount(data.word_count);
     } catch (err) {
-      setError('Failed to generate report: ' + err.message);
+      setError('Generation failed. Please verify API connection.');
     } finally {
       setLoading(false);
     }
@@ -211,9 +184,9 @@ function AIReportGenerator({ analysisResult }) {
   const downloadHTML = () => {
     const html = getHtmlPayload();
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = `fingenie-${format}-report.html`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `fingenie-report.html`;
     a.click(); URL.revokeObjectURL(url);
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 3000);
@@ -222,113 +195,99 @@ function AIReportGenerator({ analysisResult }) {
   const downloadPDF = () => {
     printViaIframe(getHtmlPayload());
     setPdfSaved(true);
-    setTimeout(() => setPdfSaved(false), 4000);
+    setTimeout(() => setPdfSaved(false), 3000);
   };
 
   return (
     <div className="ai-report-generator">
-      <div className="ai-format-section">
-        <div className="section-label">Choose report format</div>
-        <div className="ai-format-grid">
+      <div className="mb-md">
+        <h3 className="sub-label mb-sm">Select Intelligence Framework</h3>
+        <div className="grid-cols-12" style={{ gap: '12px' }}>
           {AI_REPORT_FORMATS.map(f => (
             <div
               key={f.id}
-              className={`ai-format-card ${format === f.id ? 'selected' : ''}`}
-              onClick={() => { setFormat(f.id); setReport(''); setError(''); }}
+              className={`card-light hover-lift col-span-4 ${format === f.id ? 'active-border' : ''}`}
+              onClick={() => setFormat(f.id)}
+              style={{ 
+                cursor: 'pointer', 
+                padding: '16px', 
+                border: format === f.id ? '2px solid var(--accent-blue)' : '1px solid var(--border-light)',
+                background: format === f.id ? 'var(--bg-blue-light)' : 'white'
+              }}
             >
-              <span className="aif-icon">{f.icon}</span>
-              <div className="aif-label">{f.label}</div>
-              <div className="aif-desc">{f.desc}</div>
+              <div className="d-flex items-center gap-3 mb-xs">
+                <f.Icon size={18} className={format === f.id ? 'text-accent' : 'text-secondary'} />
+                <span className="font-bold text-primary" style={{ fontSize: '14px' }}>{f.label}</span>
+              </div>
+              <p className="text-secondary" style={{ fontSize: '11px', margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="ai-data-chips">
-        <span className="ai-chip">📊 {analysisResult?.kpis?.length || 0} KPIs</span>
-        <span className="ai-chip">⚠️ {analysisResult?.risks?.length || 0} Risks</span>
-        <span className="ai-chip">💡 {analysisResult?.recommendations?.length || 0} Recs</span>
-        <span className="ai-chip">📋 {analysisResult?.raw_data?.length || 0} Data rows</span>
-        <span className="ai-chip ai-chip-type">🏷️ {analysisResult?.statement_type || 'Unknown type'}</span>
-      </div>
-
       <button
-        className={`ai-generate-btn ${loading ? 'ai-generating' : ''}`}
+        className={`btn-primary w-full mt-md d-flex items-center justify-center gap-3 ${loading ? 'loading' : ''}`}
         onClick={generate}
         disabled={loading}
+        style={{ padding: '16px' }}
       >
-        {loading
-          ? <><span className="ai-pulse-dot" /> Synthesising {selectedFmt?.label} via Groq…</>
-          : <>{selectedFmt?.icon} Generate {selectedFmt?.label} with Groq AI</>
-        }
+        {loading ? <Sparkles className="animate-spin" size={18} /> : <selectedFmt.Icon size={18} />}
+        <span>{loading ? 'Synthesizing Narrative...' : `Compose ${selectedFmt.label}`}</span>
       </button>
 
-      {error && <div className="ai-error-block">⚠️ {error}</div>}
+      {error && <div className="error-badge mt-md text-rose font-bold text-center">{error}</div>}
 
       {report && (
-        <div className="ai-report-output">
-          <div className="ai-report-toolbar">
-            <div className="ai-report-meta">
-              <span className="ai-report-badge">{selectedFmt?.icon} {selectedFmt?.label}</span>
-              <span className="ai-report-timestamp">
-                {wordCount} words ·{' '}
-                {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-              </span>
+        <div className="ai-report-output fade-in mt-xl">
+          <div className="ai-report-toolbar d-flex justify-between items-center mb-md p-sm" style={{ background: 'var(--bg-navy)', borderRadius: 'var(--radius-md) var(--radius-md) 0 0', color: 'white' }}>
+            <div className="d-flex items-center gap-3">
+              <selectedFmt.Icon size={16} className="text-accent" />
+              <span className="font-bold" style={{ fontSize: '14px' }}>DRAFT: {selectedFmt.label}</span>
             </div>
-            <div className="ai-toolbar-actions">
-              <button className="ai-tool-btn" onClick={downloadHTML}>
-                {downloaded ? '✅ Saved!' : '🌐 Download HTML'}
+            <div className="d-flex gap-2">
+              <button className="nav-item active d-flex items-center gap-2" style={{ fontSize: '11px', padding: '6px 12px' }} onClick={downloadHTML}>
+                {downloaded ? <CheckCircle2 size={12} /> : <Download size={12} />}
+                <span>{downloaded ? 'Saved' : 'HTML'}</span>
               </button>
-              <button className="ai-tool-btn ai-tool-btn-primary" onClick={downloadPDF}>
-                {pdfSaved ? '✅ Print dialog opened!' : '📄 Download PDF'}
+              <button className="btn-primary d-flex items-center gap-2" style={{ fontSize: '11px', padding: '6px 12px' }} onClick={downloadPDF}>
+                {pdfSaved ? <CheckCircle2 size={12} /> : <Printer size={12} />}
+                <span>{pdfSaved ? 'Sent' : 'PDF'}</span>
               </button>
             </div>
           </div>
-          <div className="ai-report-content" dangerouslySetInnerHTML={{ __html: mdToHtml(report) }} />
+          <div className="ai-report-content card-light" style={{ borderRadius: '0 0 var(--radius-md) var(--radius-md)', padding: '40px', borderTop: 'none' }}>
+            <div dangerouslySetInnerHTML={{ __html: mdToHtml(report) }} />
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
 export default function ReportCenter({ analysisResult }) {
   const [activeLayer, setActiveLayer] = useState('ai');
-
   if (!analysisResult) return null;
 
-  const layers = [
-    { id: 'ai',     icon: '🤖', title: 'AI Report'    },
-    { id: 'export', icon: '📦', title: 'Export Suite'  },
-  ];
-
   return (
-    <section className="card report-center-card fade-in" id="report-center-section">
-
+    <section className="report-center-section fade-in">
       <ReportCenterHeader analysisResult={analysisResult} />
 
-      <div style={{ marginBottom: '24px' }}>
-        <div className="sub-label" style={{ marginBottom: '16px' }}>REPORT GENERATION TOOLS</div>
-
-        {/* Layer nav tabs */}
-        <div className="layers-nav">
-          {layers.map(layer => (
-            <button
-              key={layer.id}
-              className={`layer-tab ${activeLayer === layer.id ? 'active' : ''} ${layer.id === 'ai' ? 'layer-tab-ai' : ''}`}
-              onClick={() => setActiveLayer(layer.id)}
-            >
-              <span className="lt-icon">{layer.icon}</span>
-              <div className="lt-title">{layer.title}</div>
-            </button>
-          ))}
+      <div className="mb-xl">
+        <h3 className="section-heading__label mb-md" style={{ color: 'var(--text-muted)' }}>Output Orchestration</h3>
+        <div className="nav-links" style={{ width: 'fit-content', background: 'var(--bg-blue-subtle)', padding: '4px', borderRadius: '12px' }}>
+          <button className={`nav-item ${activeLayer === 'ai' ? 'active' : ''}`} onClick={() => setActiveLayer('ai')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sparkles size={14} />
+            <span>AI Narrative</span>
+          </button>
+          <button className={`nav-item ${activeLayer === 'export' ? 'active' : ''}`} onClick={() => setActiveLayer('export')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Box size={14} />
+            <span>Structured Export</span>
+          </button>
         </div>
       </div>
 
-      {/* Tab panels */}
       <div className="layer-panels">
-        {activeLayer === 'ai'     && <AIReportGenerator analysisResult={analysisResult} />}
-        {activeLayer === 'export' && <ExportSuite       analysisResult={analysisResult} />}
+        {activeLayer === 'ai' ? <AIReportGenerator analysisResult={analysisResult} /> : <ExportSuite analysisResult={analysisResult} />}
       </div>
     </section>
   );

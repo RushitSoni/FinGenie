@@ -34,7 +34,7 @@ class AnalysisResponse(BaseModel):
     trends: list[Trend]
     summary: str
     recommendations: list[str]
-    parsing_mode: str  # "table" or "text"
+    parsing_mode: str  # "table", "text", or "sec"
     raw_text: Optional[str] = None
 
 

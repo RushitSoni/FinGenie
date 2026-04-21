@@ -76,11 +76,13 @@ def process_sec_datasets(
     else:
         # Default to the most recent submission in the file
         sub = sub_df.sort_values("period", ascending=False).head(1)
-        target_adsh = sub["adsh"].iloc[0]
     
     if sub.empty:
-        raise ValueError(f"Submission {target_adsh} not found.")
+        raise ValueError(
+            f"Submission {target_adsh if target_adsh else 'target'} not found in SUB dataset."
+        )
 
+    target_adsh = sub["adsh"].iloc[0]
     metadata = {
         "company_name": sub["name"].iloc[0],
         "cik": str(sub["cik"].iloc[0]),
@@ -94,11 +96,15 @@ def process_sec_datasets(
     df = num_df[num_df["adsh"] == target_adsh].copy()
     
     # 3. Join with TAG for definitions
+    # We join on tag and version. TAG dataset usually has unique entries for these.
     df = pd.merge(df, tag_df, on=["tag", "version"], how="left")
     
     # 4. Join with PRE for presentation context
+    # PRE can have multiple entries for one tag (different reports/lines). 
+    # We take the first occurrence to avoid record duplication in the master dataframe.
     pre_fil = pre_df[pre_df["adsh"] == target_adsh].copy()
-    df = pd.merge(df, pre_fil[["tag", "version", "plabel", "line", "report"]], 
+    pre_unique = pre_fil.drop_duplicates(subset=["tag", "version"])
+    df = pd.merge(df, pre_unique[["tag", "version", "plabel", "line", "report"]], 
                   on=["tag", "version"], how="left")
 
     # 5. Semantic Mapping & Cleaning

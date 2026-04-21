@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Table, ChevronDown, ChevronUp, FileSpreadsheet } from 'lucide-react';
 
 export default function DataPreview({ data, columns, statementType }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -8,27 +9,33 @@ export default function DataPreview({ data, columns, statementType }) {
   const displayData = isExpanded ? data : data.slice(0, 8);
 
   return (
-    <div className="card-light fade-in hover-lift" style={{ padding: 'var(--space-lg)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--space-xl)', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)', cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '28px' }}>📊</span>
-          <h2 className="sub-label" style={{ margin: 0, color: 'var(--bg-navy)' }}>Raw Data Ledger</h2>
+    <div className="card-light fade-in hover-lift mb-xl" style={{ overflow: 'hidden', padding: 0 }}>
+      <div 
+        className="d-flex justify-between items-center" 
+        style={{ padding: 'var(--space-md)', cursor: 'pointer', borderBottom: '1px solid var(--border-light)' }} 
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="section-heading mb-0">
+          <Table className="text-secondary" size={20} />
+          <h2 className="section-heading__label">Raw Data Ledger</h2>
           {statementType && (
-            <span style={{ padding: '4px 10px', background: 'var(--bg-blue-light)', color: 'var(--accent-blue)', borderRadius: '8px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span className="hero-badge" style={{ fontSize: '10px', marginLeft: '12px' }}>
               {statementType}
             </span>
           )}
         </div>
-        <button className="btn-secondary" style={{ padding: '8px 16px', fontSize: '13px' }}>
-          {isExpanded ? '▲ Collapse' : '▼ Show All'} ({data.length} rows)
+        <button className="btn-secondary d-flex items-center gap-2">
+          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          <span>{isExpanded ? 'Collapse' : `Show All (${data.length} rows)`}</span>
         </button>
       </div>
-      <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)' }}>
-        <table className="custom-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+      
+      <div className="custom-scrollbar" style={{ overflowX: 'auto', maxHeight: isExpanded ? '600px' : 'none' }}>
+        <table className="custom-table">
           <thead>
             <tr>
               {columns.map((col, i) => (
-                <th key={i} style={{ padding: '12px 16px', fontSize: '10px', textAlign: i > 0 ? 'right' : 'left' }}>{col}</th>
+                <th key={i} style={{ textAlign: i > 0 ? 'right' : 'left' }}>{col}</th>
               ))}
             </tr>
           </thead>
@@ -36,7 +43,7 @@ export default function DataPreview({ data, columns, statementType }) {
             {displayData.map((row, rowIdx) => (
               <tr key={rowIdx}>
                 {columns.map((col, colIdx) => (
-                  <td key={colIdx} style={{ padding: '12px 16px', fontSize: '13px', textAlign: colIdx > 0 ? 'right' : 'left', fontWeight: colIdx > 0 ? 700 : 400, borderTop: '1px solid var(--border-light)' }}>
+                  <td key={colIdx} style={{ textAlign: colIdx > 0 ? 'right' : 'left', fontWeight: colIdx > 0 ? 700 : 400 }}>
                     {formatCell(row[col], colIdx > 0)}
                   </td>
                 ))}
@@ -45,6 +52,16 @@ export default function DataPreview({ data, columns, statementType }) {
           </tbody>
         </table>
       </div>
+      
+      {!isExpanded && data.length > 8 && (
+        <div 
+          className="text-center" 
+          style={{ padding: '12px', background: 'var(--bg-blue-light)', color: 'var(--accent-blue)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+          onClick={() => setIsExpanded(true)}
+        >
+          + {data.length - 8} MORE RECORDS
+        </div>
+      )}
     </div>
   );
 }

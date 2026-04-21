@@ -3,14 +3,15 @@ import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip
 } from 'chart.js';
+import { ShieldAlert, AlertTriangle, Info, AlertCircle, Search, FileText, Zap, LayoutPanelLeft } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
 const SEVERITY_CONFIG = {
-  critical: { color: 'var(--accent-rose)', icon: '⚠️', label: 'CRITICAL', bg: 'hsl(0, 100%, 98%)' },
-  high:     { color: '#f97316', icon: '🟠', label: 'HIGH', bg: 'hsl(25, 100%, 98%)' },
-  medium:   { color: '#f59e0b', icon: '🟡', label: 'MEDIUM', bg: 'hsl(45, 100%, 98%)' },
-  low:      { color: 'var(--accent-emerald)', icon: '🟢', label: 'LOW', bg: 'hsl(160, 80%, 98%)' },
+  critical: { color: 'var(--accent-rose)', icon: ShieldAlert, label: 'CRITICAL', bg: 'rgba(225,29,72,0.05)' },
+  high:     { color: '#f97316', icon: AlertTriangle, label: 'HIGH', bg: 'rgba(249,115,22,0.05)' },
+  medium:   { color: '#f59e0b', icon: AlertCircle, label: 'MEDIUM', bg: 'rgba(245,158,11,0.05)' },
+  low:      { color: 'var(--accent-emerald)', icon: Info, label: 'LOW', bg: 'rgba(5,150,105,0.05)' },
 };
 
 export default function RiskAssessment({ result }) {
@@ -20,7 +21,7 @@ export default function RiskAssessment({ result }) {
   const safeRisks = risks || [];
 
   const chartData = {
-    labels: safeRisks.map((_, i) => `R${i+1}`),
+    labels: safeRisks.map((_, i) => `V${i+1}`),
     datasets: [{
       label: 'Severity Level',
       data: safeRisks.map(r => r.severity === 'critical' ? 4 : r.severity === 'high' ? 3 : r.severity === 'medium' ? 2 : 1),
@@ -46,93 +47,107 @@ export default function RiskAssessment({ result }) {
   }));
 
   return (
-    <div className="risk-assessment fade-in slide-up" style={{ marginBottom: 'var(--space-2xl)', paddingTop: 'var(--space-md)' }}>
-      <div className="report-header" style={{marginBottom: 'var(--space-xl)', borderBottom: '1px solid var(--border-light)', paddingBottom: '32px'}}>
-        <div className="sub-label" style={{color: 'var(--accent-rose)', marginBottom: '8px', fontSize: '13px'}}>Vector Vulnerability Audit</div>
-        <h1 className="big-title" style={{fontSize: '48px'}}>Financial Risk <br/><span style={{color: 'var(--text-secondary)'}}>Ledger.</span></h1>
+    <div className="risk-assessment fade-in slide-up" style={{ paddingBottom: 'var(--space-2xl)' }}>
+      <header className="page-header mb-xl">
+        <div className="d-flex items-center gap-2 mb-xs">
+          <ShieldAlert className="text-secondary" size={16} />
+          <span className="page-header__eyebrow">Risk Exposure Index</span>
+        </div>
+        <h1 className="page-header__title">
+          Vulnerability & <span className="page-header__accent">Risk Assessment.</span>
+        </h1>
+        <p className="hero-subtitle">
+          Automated detection of financial anomalies, liquidity threats, and strategic vulnerabilities.
+        </p>
         
-        <div style={{marginTop: '32px'}}>
-          <div className="card-light" style={{padding: '24px 48px', display: 'flex', gap: '48px', alignItems: 'center', width: 'fit-content'}}>
+        <div className="mt-lg">
+          <div className="card-light d-flex items-center gap-8" style={{ padding: '24px 32px', width: 'fit-content', background: 'var(--bg-blue-light)', border: 'none' }}>
             <div>
-              <div className="sub-label" style={{marginBottom: '4px', fontSize: '12px'}}>Total Vectors</div>
-              <div style={{fontSize: '40px', fontWeight: 900, color: 'var(--bg-navy)', fontFamily: 'Outfit', lineHeight: 1}}>{safeRisks.length}</div>
+              <div className="sub-label mb-0">Total Vectors</div>
+              <div className="metric-big" style={{ fontSize: '40px' }}>{safeRisks.length}</div>
             </div>
-            <div style={{height: '60px', width: '1px', background: 'var(--border)'}} />
-            <div style={{fontSize: '15px', color: 'var(--text-secondary)', fontWeight: 600, maxWidth: '300px', lineHeight: 1.5}}>
+            <div style={{ height: '40px', width: '1px', background: 'var(--border-strong)', opacity: 0.2 }} />
+            <p className="text-secondary" style={{ fontSize: '13px', fontWeight: 600, maxWidth: '240px', lineHeight: 1.5 }}>
                Institutional-grade vectors cross-referenced against global treasury standards.
-            </div>
+            </p>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="grid-cols-12" style={{gap: '40px'}}>
+      <div className="grid-cols-12" style={{ gap: 'var(--space-xl)' }}>
         <div className="col-span-8">
-          <div className="card-light" style={{padding: '0', overflow: 'hidden'}}>
-            <div style={{padding: '20px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-               <h3 style={{fontSize: '16px', fontWeight: 900}}>Risk Identification</h3>
-               <div style={{fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)'}}>REVISION V4.2</div>
+          <div className="card-light" style={{ padding: 0 }}>
+            <div className="d-flex justify-between items-center" style={{ padding: '20px', borderBottom: '1px solid var(--border-light)' }}>
+               <h3 className="section-heading__label" style={{ fontSize: '16px' }}>Identified Vulnerabilities</h3>
+               <span className="hero-badge">REVISION V4.2</span>
             </div>
             
-            <div style={{padding: '12px'}}>
+            <div style={{ padding: '16px' }} className="d-flex flex-column gap-3">
               {safeRisks.length > 0 ? (
                 safeRisks.map((risk, idx) => {
                   const config = SEVERITY_CONFIG[risk.severity] || SEVERITY_CONFIG.low;
+                  const Icon = config.icon;
                   return (
-                    <div key={idx} style={{
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '16px', 
-                      marginBottom: '8px', 
+                    <div key={idx} className="hover-lift d-flex items-start gap-4" style={{
                       background: config.bg, 
-                      padding: '16px', 
-                      borderRadius: '8px',
-                      border: '1px solid transparent'
+                      padding: '20px', 
+                      borderRadius: 'var(--radius-md)',
+                      borderLeft: `4px solid ${config.color}`
                     }}>
-                      <div style={{fontSize: '20px'}}>{config.icon}</div>
-                      <div style={{flex: 1}}>
-                        <div style={{fontSize: '9px', fontWeight: 800, color: config.color, letterSpacing: '0.05em', marginBottom: '2px'}}>{config.label}</div>
-                        <div style={{fontSize: '15px', fontWeight: 900, color: 'var(--bg-navy)', marginBottom: '2px'}}>{risk.risk}</div>
-                        <div style={{fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4}}>{risk.description}</div>
+                      <div style={{ padding: '8px', background: 'white', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
+                        <Icon size={18} style={{ color: config.color }} />
                       </div>
-                      <div style={{textAlign: 'right'}}>
-                         <div style={{fontSize: '18px', fontWeight: 900, color: config.color, fontFamily: 'Outfit'}}>{risk.severity === 'critical' ? '9.8' : risk.severity === 'high' ? '7.5' : risk.severity === 'medium' ? '4.2' : '1.5'}</div>
+                      <div style={{ flex: 1 }}>
+                        <div className="d-flex justify-between items-start mb-xs">
+                          <div>
+                            <span style={{ fontSize: '10px', fontWeight: 800, color: config.color, letterSpacing: '0.05em' }}>{config.label}</span>
+                            <h4 className="text-primary font-bold" style={{ fontSize: '16px', margin: 0 }}>{risk.risk}</h4>
+                          </div>
+                          <div className="metric-big" style={{ fontSize: '18px', color: config.color }}>
+                            {risk.severity === 'critical' ? '9.8' : risk.severity === 'high' ? '7.5' : risk.severity === 'medium' ? '4.2' : '1.5'}
+                          </div>
+                        </div>
+                        <p className="text-secondary" style={{ fontSize: '13px', lineHeight: 1.6, margin: 0 }}>{risk.description}</p>
                       </div>
                     </div>
                   )
                 })
               ) : (
-                <div style={{padding: '32px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '13px'}}>
-                   No risks detected.
+                <div style={{ padding: '48px', textAlign: 'center' }}>
+                   <p className="text-muted">No institutional risks detected in the current dataset.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="col-span-4" style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-          <div className="card-dark" style={{padding: '24px'}}>
-            <h3 className="sub-label" style={{color: 'rgba(255,255,255,0.4)', marginBottom: '20px'}}>Mitigation Protocols</h3>
+        <div className="col-span-4 d-flex flex-column gap-6">
+          <div className="card-dark" style={{ padding: '32px' }}>
+            <div className="d-flex items-center gap-2 mb-lg">
+              <Zap className="text-accent" size={18} />
+              <h3 className="sub-label mb-0" style={{ color: 'white', opacity: 0.8 }}>Mitigation Protocols</h3>
+            </div>
             
-            <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+            <div className="d-flex flex-column gap-6">
               {mitigations.length > 0 ? (
-                mitigations.slice(0, 3).map((mit, idx) => (
-                  <div key={idx} style={{display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-                    <div style={{fontSize: '20px', fontWeight: 900, color: 'rgba(255,255,255,0.08)', fontFamily: 'Outfit'}}>0{idx + 1}</div>
+                mitigations.slice(0, 4).map((mit, idx) => (
+                  <div key={idx} className="d-flex gap-4">
+                    <span style={{ fontSize: '14px', fontWeight: 900, color: 'var(--accent-blue)', opacity: 0.4 }}>0{idx + 1}</span>
                     <div>
-                      <div style={{fontSize: '13px', fontWeight: 800, color: 'white', marginBottom: '4px'}}>{mit.name}</div>
-                      <div style={{fontSize: '12px', color: '#9ca3af', lineHeight: 1.5}}>{mit.text}</div>
+                      <div className="text-white font-bold mb-xs" style={{ fontSize: '13px' }}>{mit.name}</div>
+                      <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, margin: 0 }}>{mit.text}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div style={{fontSize: '12px', color: '#9ca3af', opacity: 0.6}}>Standard liquidity monitoring applies.</div>
+                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>Standard operational monitoring applies.</p>
               )}
             </div>
           </div>
 
-          <div className="card-light" style={{padding: '20px'}}>
-            <div className="sub-label">Exposure Distribution</div>
-            <div style={{height: '120px', marginTop: '12px'}}>
+          <div className="card-light" style={{ padding: '24px' }}>
+            <div className="sub-label mb-md">Exposure Distribution</div>
+            <div style={{ height: '140px' }}>
                <Bar data={chartData} options={chartOptions} />
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { MessageSquare, Send, X, Bot, User, CornerDownLeft } from 'lucide-react';
 import { getApiBase } from '../api/client';
 
 export default function DocChat({ analysisResult }) {
@@ -41,26 +42,14 @@ export default function DocChat({ analysisResult }) {
           summary: analysisResult?.summary || '',
           kpis: analysisResult?.kpis || [],
           risks: analysisResult?.risks || [],
-          conversation_history: messages.slice(1),
+          conversation_history: messages.slice(1).map(m => ({ role: m.role, content: m.content })),
         }),
       });
 
       const data = await res.json();
       setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
-      let errorMsg = 'Network error — check backend is running.';
-      
-      if (err.response?.status === 400) {
-        errorMsg = `Invalid input: ${err.response.data?.detail || 'Check your message.'}`;
-      } else if (err.response?.status === 500) {
-        errorMsg = `Server error: ${err.response.data?.detail || 'Try again in a moment.'}`;
-      } else if (err.response?.status === 502) {
-        errorMsg = `Service temporarily unavailable: ${err.response.data?.detail || 'Try again.'}`;
-      } else if (err.code === 'ECONNABORTED') {
-        errorMsg = 'Request timed out. The backend may be slow. Try a shorter question.';
-      }
-      
-      setMessages((prev) => [...prev, { role: 'assistant', content: `❌ ${errorMsg}` }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: `❌ Network error — check backend is running.` }]);
     } finally {
       setLoading(false);
     }
@@ -78,85 +67,69 @@ export default function DocChat({ analysisResult }) {
   return createPortal(
     <>
       <style>{`
-        /* ── page-blue palette (hardcoded to match FinGenie blue theme) ── */
-        /* primary blue: #2563eb  |  light fill: #eff6ff  |  border: #bfdbfe  |  shadow: rgba(37,99,235,…) */
-
         .chat-fab-wrapper {
           position: fixed;
-          bottom: 2rem;
-          right: 2rem;
+          bottom: 24px;
+          right: 24px;
           z-index: 10000;
-          pointer-events: none;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
         .chat-fab {
-          pointer-events: auto;
           display: flex;
           align-items: center;
-          gap: 0.8rem;
+          gap: 12px;
           height: 56px;
-          padding: 0 1.5rem 0 0.75rem;
-          background: var(--gradient-primary);
-          color: #ffffff;
-          border: none;
-          border-radius: 9999px;
-          font-size: 1rem;
-          font-weight: 800;
-          font-family: var(--sans);
-          letter-spacing: 0.5px;
+          padding: 0 24px 0 10px;
+          background: var(--bg-navy);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 28px;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          font-weight: 700;
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
           cursor: pointer;
-          box-shadow: var(--shadow-lg);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          outline: none;
+          box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3);
+          transition: var(--transition);
+          position: relative;
+          overflow: hidden;
         }
 
         .chat-fab:hover {
-          box-shadow: 0 12px 24px rgba(37, 99, 235, 0.4);
-          transform: translateY(-4px) scale(1.05);
+          transform: translateY(-6px) scale(1.02);
+          box-shadow: 0 20px 48px rgba(37, 99, 235, 0.5), 
+                      0 0 0 4px rgba(37, 99, 235, 0.1);
+          background: var(--gradient-premium);
+          border-color: rgba(255,255,255,0.2);
         }
 
-        .chat-fab:focus-visible {
-          outline: 2px solid var(--accent-blue);
-          outline-offset: 3px;
+        .chat-fab:hover .chat-fab-icon {
+          transform: scale(1.1) rotate(-5deg);
+          background: var(--bg-navy);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* icon circle — white bg + blue icon so it pops inside the blue FAB */
         .chat-fab-icon {
-          width: 38px;
-          height: 38px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(255, 255, 255, 0.2);
+          background: var(--gradient-premium);
           border-radius: 50%;
-          flex-shrink: 0;
-          backdrop-filter: blur(4px);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+          transition: var(--transition);
         }
 
-        .chat-fab-icon svg {
-          width: 18px;
-          height: 18px;
-          fill: #ffffff;
-          display: block;
-        }
-
-        .chat-fab-label {
-          font-size: 1rem;
-          font-weight: 800;
-          white-space: nowrap;
-          color: #ffffff;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        /* ── Chat Panel ── */
         .chat-panel {
           position: fixed;
-          bottom: 6.5rem;
-          right: 2rem;
+          bottom: 96px;
+          right: 24px;
           width: 400px;
           height: 600px;
-          background: #ffffff;
+          background: white;
           border: 1px solid var(--border-light);
           border-radius: 24px;
           display: flex;
@@ -164,339 +137,213 @@ export default function DocChat({ analysisResult }) {
           z-index: 9999;
           box-shadow: var(--shadow-xl);
           overflow: hidden;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          transform-origin: bottom right;
-          animation: slideUpFade 0.4s ease-out;
+          animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes slideUpFade {
-          from { opacity: 0; transform: translateY(20px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @media (prefers-color-scheme: dark) {
-          .chat-panel { 
-            background: var(--bg-navy); 
-            border-color: rgba(255,255,255,0.1);
+        @media (max-width: 500px) {
+          .chat-panel {
+            width: calc(100vw - 32px);
+            right: 16px;
+            bottom: 88px;
+            height: 70vh;
           }
         }
 
-        /* ── Panel Header ── */
-        .chat-panel-header {
+        .chat-header {
+          padding: 16px 24px;
+          background: var(--bg-navy);
+          color: white;
           display: flex;
+          align-items: center;
           justify-content: space-between;
-          align-items: center;
-          padding: 1.25rem 1.5rem;
-          background: var(--gradient-primary);
-          color: white;
-          flex-shrink: 0;
+          position: relative;
         }
 
-        .chat-panel-header-title {
-          font-family: var(--sans);
-          font-size: 1rem;
-          font-weight: 800;
-          letter-spacing: 0.5px;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
+        .chat-header::after {
+          content: '';
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         }
 
-        .chat-panel-header-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 3px 8px;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-family: var(--mono);
-          background: rgba(255,255,255,0.2);
-          color: #ffffff;
-          letter-spacing: 1px;
-          font-weight: 900;
-          backdrop-filter: blur(4px);
-        }
-
-        .chat-close-btn {
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.2);
-          color: white;
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          border-radius: 8px;
-          transition: all 0.2s;
-        }
-
-        .chat-close-btn:hover {
-          background: rgba(255,255,255,0.2);
-          transform: rotate(90deg);
-        }
-
-        /* ── Messages Area ── */
         .chat-messages {
           flex: 1;
           overflow-y: auto;
-          padding: 1.5rem;
+          padding: 24px;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
-          background: #fcfdfe;
+          gap: 20px;
+          background: #f8fafc;
         }
 
-        @media (prefers-color-scheme: dark) {
-          .chat-messages { background: #0b0f1a; }
-        }
-
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
-
-        /* ── Chat Bubbles ── */
-        .chat-bubble {
-          padding: 1rem 1.25rem;
-          border-radius: 18px;
-          font-size: 0.9375rem;
-          font-family: var(--sans);
-          line-height: 1.6;
+        .bubble {
+          padding: 12px 16px;
+          border-radius: 16px;
+          font-size: 14px;
           max-width: 85%;
-          white-space: pre-wrap;
-          word-break: break-word;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+          line-height: 1.5;
         }
 
-        .chat-user {
-          background: var(--gradient-primary);
+        .bubble-assistant {
+          background: white;
+          border: 1px solid var(--border-subtle);
+          align-self: flex-start;
+          border-bottom-left-radius: 4px;
+        }
+
+        .bubble-user {
+          background: var(--accent-blue);
           color: white;
           align-self: flex-end;
           border-bottom-right-radius: 4px;
         }
 
-        .chat-assistant {
+        .chat-input-area {
+          padding: 20px 24px;
+          border-top: 1px solid var(--border-subtle);
           background: white;
-          border: 1px solid var(--border-light);
-          color: var(--text-primary);
-          align-self: flex-start;
-          border-bottom-left-radius: 4px;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-          .chat-assistant {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
-            color: white;
-          }
         }
 
-        /* ── Suggestion Chips ── */
-        .chat-suggestions {
+        .input-wrapper {
           display: flex;
-          flex-wrap: wrap;
-          gap: 0.6rem;
-          padding: 1rem 1.5rem;
-          background: #ffffff;
-          border-top: 1px solid var(--border-light);
-        }
-        
-        @media (prefers-color-scheme: dark) {
-          .chat-suggestions { background: transparent; border-color: rgba(255,255,255,0.1); }
-        }
-
-        .chat-suggestion-chip {
-          background: var(--bg-blue-light);
-          border: 1px solid var(--border-light);
-          color: var(--accent-blue);
-          padding: 0.5rem 1rem;
+          align-items: center;
+          gap: 12px;
+          background: var(--bg-blue-subtle);
+          padding: 8px 12px;
           border-radius: 12px;
-          font-size: 0.8125rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .chat-suggestion-chip:hover { 
-          background: white;
-          border-color: var(--accent-blue);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-        }
-
-        /* ── Input Row ── */
-        .chat-input-row {
-          display: flex;
-          gap: 0.75rem;
-          padding: 1.25rem 1.5rem;
-          border-top: 1px solid var(--border-light);
-          background: #ffffff;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-          .chat-input-row { background: transparent; border-color: rgba(255,255,255,0.1); }
+          border: 1px solid var(--border-strong);
         }
 
         .chat-input {
           flex: 1;
-          background: #f8fafc;
-          border: 1px solid var(--border-light);
-          border-radius: 12px;
-          color: var(--text-primary);
-          padding: 0.75rem 1rem;
-          font-size: 0.9375rem;
-          outline: none;
-          transition: all 0.2s;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-          .chat-input { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1); }
-        }
-
-        .chat-input:focus { 
-          border-color: var(--accent-blue); 
-          background: white;
-          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); 
-        }
-
-        .chat-send-btn {
-          background: var(--gradient-primary);
-          color: #ffffff;
           border: none;
-          border-radius: 12px;
-          width: 44px;
-          height: 44px;
+          background: none;
+          outline: none;
+          font-family: inherit;
+          font-size: 14px;
+          padding: 4px;
+        }
+
+        .chip-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .chip {
+          font-size: 12px;
+          padding: 6px 12px;
+          background: var(--bg-blue-light);
+          color: var(--accent-blue);
+          border-radius: 20px;
+          border: 1px solid rgba(37, 99, 235, 0.1);
           cursor: pointer;
-          transition: all 0.3s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.2rem;
+          font-weight: 600;
         }
 
-        .chat-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .chat-send-btn:not(:disabled):hover { 
-          transform: scale(1.05);
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        .chip:hover {
+          background: var(--accent-blue);
+          color: white;
         }
 
-        /* ── Typing Indicator ── */
-        .chat-typing {
-          padding: 0.75rem 1rem;
-          background: #ffffff;
-          border: 1px solid var(--border-light);
-          border-radius: 14px;
-          border-bottom-left-radius: 3px;
-          align-self: flex-start;
+        .dot-pulse {
           display: flex;
-          gap: 5px;
-          align-items: center;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-          .chat-typing { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+          gap: 6px;
+          padding: 8px 12px;
+          background: white;
+          border-radius: 12px;
+          width: fit-content;
+          border: 1px solid var(--border-subtle);
+          margin-bottom: 8px;
         }
 
         .dot {
-          width: 6px;
-          height: 6px;
+          width: 6px; height: 6px;
           border-radius: 50%;
           background: var(--accent-blue);
-          display: block;
-          animation: dotBounce 1.2s infinite;
+          animation: wave 1.2s infinite ease-in-out;
         }
-
+        
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes dotBounce {
-          0%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-7px); }
+        @keyframes wave {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+          30% { transform: translateY(-6px); opacity: 1; }
         }
       `}</style>
 
-      {/* Floating Action Button */}
       <div className="chat-fab-wrapper">
-        <button
-          className="chat-fab"
-          onClick={() => setIsOpen((o) => !o)}
-          title="Chat with your document"
-          id="chat-fab-btn"
-        >
-          <span className="chat-fab-icon">
-            {isOpen
-              ? <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l12 12M13 1L1 13" stroke="#fff" strokeWidth="2" strokeLinecap="round" fill="none"/></svg>
-              : <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M1 1h12a1 1 0 011 1v7a1 1 0 01-1 1H4l-3 3V2a1 1 0 011-1z" fill="#fff"/></svg>
-            }
-          </span>
-          {!isOpen && <span className="chat-fab-label">Ask AI</span>}
+        <button className="chat-fab" onClick={() => setIsOpen(!isOpen)}>
+          <div className="chat-fab-icon">
+            {isOpen ? <X size={20} /> : <MessageSquare size={20} />}
+          </div>
+          {!isOpen && <span>AI ANALYST</span>}
         </button>
       </div>
 
-      {/* Chat Panel */}
       {isOpen && (
-        <div className="chat-panel" id="chat-panel">
-          <div className="chat-panel-header">
-            <span className="chat-panel-header-title">
-              Ask about your document
-              <span className="chat-panel-header-badge">AI</span>
-            </span>
-            <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
-              ✕
+        <div className="chat-panel">
+          <div className="chat-header">
+            <div className="d-flex items-center gap-3">
+               <Bot size={20} className="text-accent" />
+               <h3 style={{ fontSize: '16px', margin: 0 }}>Intelligence Feed</h3>
+            </div>
+            <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }} onClick={() => setIsOpen(false)}>
+               <X size={18} />
             </button>
           </div>
 
-          <div className="chat-messages" id="chat-messages">
-            {messages.slice(1).map((msg, idx) => (
-              <div key={idx} className={`chat-bubble chat-${msg.role}`}>
-                {msg.content}
+          <div className="chat-messages">
+            {messages.map((msg, i) => (
+              <div key={i} className={`bubble bubble-${msg.role} d-flex flex-column gap-2`}>
+                <div className="d-flex items-center gap-2 mb-1" style={{ fontSize: '10px', textTransform: 'uppercase', opacity: 0.5, fontWeight: 800 }}>
+                   {msg.role === 'assistant' ? <Bot size={12} /> : <User size={12} />}
+                   <span>{msg.role === 'assistant' ? 'FinGenie AI' : 'Internal User'}</span>
+                </div>
+                <div>{msg.content}</div>
               </div>
             ))}
             {loading && (
-              <div className="chat-bubble chat-assistant chat-typing">
-                <span className="dot" />
-                <span className="dot" />
-                <span className="dot" />
+              <div className="dot-pulse">
+                <div className="dot" />
+                <div className="dot" style={{ animationDelay: '0.2s' }} />
+                <div className="dot" style={{ animationDelay: '0.4s' }} />
               </div>
             )}
             <div ref={bottomRef} />
           </div>
 
-          {messages.length <= 1 && (
-            <div className="chat-suggestions">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  className="chat-suggestion-chip"
-                  onClick={() => setInput(s)}
-                >
-                  {s}
-                </button>
-              ))}
+          <div className="chat-input-area">
+            {messages.length === 1 && (
+              <div className="chip-container">
+                {suggestions.map(s => (
+                  <button key={s} className="chip" onClick={() => setInput(s)}>{s}</button>
+                ))}
+              </div>
+            )}
+            <div className="input-wrapper">
+              <input 
+                className="chat-input" 
+                placeholder="Query institutional data..."
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              />
+              <button 
+                className="btn-primary" 
+                style={{ padding: '8px', borderRadius: '8px' }} 
+                onClick={sendMessage} 
+                disabled={loading || !input.trim()}
+              >
+                <Send size={16} />
+              </button>
             </div>
-          )}
-
-          <div className="chat-input-row">
-            <input
-              className="chat-input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Ask anything about your document..."
-              disabled={loading}
-              id="chat-input"
-            />
-            <button
-              className="chat-send-btn"
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              id="chat-send-btn"
-            >
-              ➤
-            </button>
           </div>
         </div>
       )}
-    </>,
-    document.body
-  );
+    </>
+  , document.body);
 }

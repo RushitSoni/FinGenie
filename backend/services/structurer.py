@@ -1,18 +1,11 @@
 import json
 import os
+import asyncio
+from functools import partial
 import pandas as pd
-from groq import Groq
-from dotenv import load_dotenv
+from services.groq_client import get_groq_client
 
-load_dotenv()
-
-def get_groq_client(api_key: str = None) -> Groq:
-    key = api_key or os.getenv("GROQ_API_KEY")
-    if not key:
-        raise ValueError("Groq API key not found.")
-    return Groq(api_key=key)
-
-def extract_data_from_text(text: str) -> tuple[pd.DataFrame, str]:
+async def extract_data_from_text(text: str) -> tuple[pd.DataFrame, str]:
     """
     Uses LLM to extract structured financial data from raw text.
     Returns (DataFrame, statement_type).
@@ -86,17 +79,22 @@ EDGE CASES:
 
     try:
         client = get_groq_client()
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "You are a financial data extraction expert with perfect accuracy in converting unstructured text to structured JSON. You always follow the exact format specified and never add explanations outside the JSON."
-                },
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.1,
-            response_format={"type": "json_object"}
+        
+        # Run blocking Groq API call in thread pool
+        response = await asyncio.to_thread(
+            partial(
+                client.chat.completions.create,
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": "You are a financial data extraction expert with perfect accuracy in converting unstructured text to structured JSON. You always follow the exact format specified and never add explanations outside the JSON."
+                    },
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
         )
 
         result = json.loads(response.choices[0].message.content)
@@ -107,8 +105,6 @@ EDGE CASES:
             return pd.DataFrame(), statement_type
 
         # Convert the nested dict to a DataFrame
-        # The keys of data_dict are the row labels (metrics)
-        # The values are dicts of period: value
         df = pd.DataFrame.from_dict(data_dict, orient='index')
         
         # Move the index (metrics) to the first column
@@ -118,5 +114,7 @@ EDGE CASES:
         return df, statement_type
 
     except Exception as e:
-        print(f"Error in extraction: {e}")
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in LLM data extraction: {str(e)}", exc_info=True)
         return pd.DataFrame(), "Financial Statement"

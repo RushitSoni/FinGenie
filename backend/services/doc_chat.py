@@ -1,16 +1,8 @@
+import asyncio
+from functools import partial
 import os
 import pandas as pd
-from groq import Groq
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
-def get_groq_client() -> Groq:
-    key = os.getenv("GROQ_API_KEY")
-    if not key:
-        raise ValueError("GROQ_API_KEY not found in environment variables.")
-    return Groq(api_key=key)
+from services.groq_client import get_groq_client
 
 
 def build_doc_context(
@@ -97,10 +89,15 @@ Remember: Your goal is to empower users with financial understanding, not overwh
     messages.append({"role": "user", "content": user_message})
 
     client = get_groq_client()
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=messages,
-        temperature=0.3,
-        max_tokens=1024,
+    
+    # Run blocking Groq API call in thread pool to prevent blocking event loop
+    response = await asyncio.to_thread(
+        partial(
+            client.chat.completions.create,
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=0.3,
+            max_tokens=1024,
+        )
     )
     return response.choices[0].message.content.strip()

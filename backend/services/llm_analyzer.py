@@ -3,20 +3,9 @@ import os
 import asyncio
 from functools import partial
 import pandas as pd
-from groq import Groq
-from dotenv import load_dotenv
 from fastapi import HTTPException
 from models.schemas import KPI, Risk, Trend
-
-load_dotenv()
-
-
-def get_groq_client(api_key: str = None) -> Groq:
-    """Get a Groq client with the provided or env API key."""
-    key = api_key or os.getenv("GROQ_API_KEY")
-    if not key:
-        raise ValueError("Groq API key not found. Set GROQ_API_KEY env variable or provide via request.")
-    return Groq(api_key=key)
+from services.groq_client import get_groq_client
 
 
 async def generate_summary(

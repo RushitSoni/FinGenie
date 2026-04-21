@@ -144,6 +144,9 @@ def parse_sec_zip(content: bytes) -> dict[str, pd.DataFrame]:
             # 1. Read SUB.txt first to find the target ADSH
             with z.open(filenames["sub.txt"]) as f:
                 sub_df = pd.read_csv(f, sep="\t", encoding_errors="replace")
+                if sub_df.empty:
+                    raise ValueError("The SUB.txt file is empty. Cannot identify a target filing.")
+                
                 # Pick the most recent submission
                 sub_df["period"] = pd.to_numeric(sub_df["period"], errors='coerce')
                 sub_df = sub_df.sort_values("period", ascending=False)

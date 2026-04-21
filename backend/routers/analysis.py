@@ -55,7 +55,7 @@ async def upload_and_analyze(
             logger.info(f"Extracting data from text content (PDF with no tables)")
             # raw_content is actually raw_text in this case (per parser.py return)
             from services.structurer import extract_data_from_text
-            df, extracted_type = extract_data_from_text(raw_content)
+            df, extracted_type = await extract_data_from_text(raw_content)
             if not df.empty:
                 statement_type = extracted_type
 
