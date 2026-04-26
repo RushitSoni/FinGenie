@@ -25,4 +25,4 @@ dist-ssr
 .env
 
 TECHNICAL_DOCUMENTATION.md
-frontend/.stryker-tmp/
+stryker-tmp/
